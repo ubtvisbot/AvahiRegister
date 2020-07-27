@@ -21,7 +21,16 @@ string GetInfo::getSN()
         sn = buff;
 
         string::size_type pos =sn.find_first_of("=");
+        if (pos == string::npos)
+        {
+            pclose(fp);
+            qDebug() << "can not find separator =";
+            return "";
+        }
+
         sn = sn.substr(pos + 1);
+
+        // delete all of the last '\n'
         while (sn[sn.size() - 1] == '\n')
         {
             sn.erase(sn.size() - 1);
@@ -55,7 +64,16 @@ string GetInfo::getVersion(const char *path)
         version = buff;
 
         string::size_type pos = version.find_first_of("_");
+        if (pos == string::npos)
+        {
+            fclose(fp);
+            qDebug() << "can not find separator _";
+            return "";
+        }
+
         version = version.substr(pos + 1);
+
+        // delete all of the last '\n'
         while (version[version.size() - 1] == '\n')
         {
             version.erase(version.size() - 1);
@@ -82,6 +100,8 @@ string GetInfo::getState(const char *path)
 
         fgets(buff, sizeof(buff), fp);
         state = buff;
+
+        // delete all of the last '\n'
         while (state[state.size() - 1] == '\n')
         {
             state.erase(state.size() - 1);

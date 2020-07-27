@@ -49,7 +49,7 @@ static void entry_group_callback(AvahiEntryGroup *g, AvahiEntryGroupState state,
     s_group = g;
 
     /* Called whenever the entry group state changes */
-qDebug() << __func__ << "enter";
+    qDebug() << __func__ << "enter";
     switch (state) {
     case AVAHI_ENTRY_GROUP_ESTABLISHED :
         qDebug() << __func__ << "AVAHI_ENTRY_GROUP_ESTABLISHED";
@@ -74,7 +74,7 @@ qDebug() << __func__ << "enter";
     }
 
     case AVAHI_ENTRY_GROUP_FAILURE :
-qDebug() << __func__ << "AVAHI_ENTRY_GROUP_FAILURE";
+        qDebug() << __func__ << "AVAHI_ENTRY_GROUP_FAILURE";
         fprintf(stderr, "Entry group failure: %s\n", avahi_strerror(avahi_client_errno(avahi_entry_group_get_client(g))));
 
         /* Some kind of failure happened while we were registering our services */
@@ -93,7 +93,7 @@ static void create_services(AvahiClient *c) {
     char *n;
     int ret;
     assert(c);
-qDebug() << __func__ << "enter";
+    qDebug() << __func__ << "enter";
     /* If this is the first time we're called, let's create a new
      * entry group if necessary */
 
@@ -128,7 +128,7 @@ qDebug() << __func__ << "enter";
             goto fail;
         }
     }
-qDebug() << __func__ << "exit";
+    qDebug() << __func__ << "exit";
     return;
 
 collision:
@@ -154,32 +154,32 @@ fail:
 
 static void client_callback(AvahiClient *c, AvahiClientState state, AVAHI_GCC_UNUSED void * userdata) {
     assert(c);
-qDebug() << __func__ << "enter";
+    qDebug() << __func__ << "enter";
     /* Called whenever the client or server state changes */
 
     switch (state) {
     case AVAHI_CLIENT_S_RUNNING:
-qDebug() << __func__ << "AVAHI_CLIENT_S_RUNNING";
+        qDebug() << __func__ << "AVAHI_CLIENT_S_RUNNING";
         /* The server has startup successfully and registered its host
              * name on the network, so it's time to create our services */
         create_services(c);
         break;
 
     case AVAHI_CLIENT_FAILURE:
-qDebug() << __func__ << "AVAHI_CLIENT_FAILURE";
+        qDebug() << __func__ << "AVAHI_CLIENT_FAILURE";
         fprintf(stderr, "Client failure: %s\n", avahi_strerror(avahi_client_errno(c)));
         avahi_simple_poll_quit(s_simple_poll);
 
         break;
 
     case AVAHI_CLIENT_S_COLLISION:
-qDebug() << __func__ << "AVAHI_CLIENT_S_COLLISION";
+        qDebug() << __func__ << "AVAHI_CLIENT_S_COLLISION";
         /* Let's drop our registered services. When the server is back
              * in AVAHI_SERVER_RUNNING state we will register them
              * again with the new host name. */
 
     case AVAHI_CLIENT_S_REGISTERING:
-qDebug() << __func__ << "AVAHI_CLIENT_S_REGISTERING";
+        qDebug() << __func__ << "AVAHI_CLIENT_S_REGISTERING";
         /* The server records are now being established. This
              * might be caused by a host name change. We need to wait
              * for our own records to register until the host name is
@@ -220,8 +220,27 @@ int main(int argc, char *argv[])
     GetInfo getInfo;
 
     string version = getInfo.getVersion(kVersionFilePath);
+    qDebug()<< "version " << QString::fromStdString(version);
+    if (version.empty())
+    {
+        qDebug() << "get version fail";
+        return -1;
+    }
+
     string sn = getInfo.getSN();
+    qDebug()<< "SN " << QString::fromStdString(sn);
+    if (sn.empty())
+    {
+        qDebug() << "get SN fail";
+        return -1;
+    }
+
     string state = getInfo.getState(kStateFilePath);
+    qDebug() << "state " << QString::fromStdString(state);
+    if (state.empty())
+    {
+        state = "1";
+    }
 
     s_version = version;
     s_state = state;
@@ -245,24 +264,24 @@ int main(int argc, char *argv[])
 
     while ((ch = getopt (argc, argv, "?hn:p:t:v")) != -1) {
         switch(ch) {
-            case 'h':
-            case '?':
-                usage();
-                break;
-            case 'n':
-                localName = optarg;
-                break;
-            case 'p':
-                s_portNumber = atoi(optarg);
-                break;
-            case 't':
-                s_type = optarg;
-                break;
-            case 'v':
-                verbose = 1;
-                break;
-            default:
-                break;
+        case 'h':
+        case '?':
+            usage();
+            break;
+        case 'n':
+            localName = optarg;
+            break;
+        case 'p':
+            s_portNumber = atoi(optarg);
+            break;
+        case 't':
+            s_type = optarg;
+            break;
+        case 'v':
+            verbose = 1;
+            break;
+        default:
+            break;
         }
     }
 
@@ -293,7 +312,7 @@ int main(int argc, char *argv[])
     avahi_simple_poll_loop(s_simple_poll);
 
     return 0;
-//    return a.exec();
+    //    return a.exec();
 
 fail:
 
